@@ -15,6 +15,7 @@ def kMeans(data, k, max_iter, min_improve_ratio= 1E-5):
 
     cent_x = cent_init
     clst_inds_ls = [[] for _ in range(k)]
+    loss= 0
     for it in range(max_iter):
         loss_old= loss;
         loss = 0
@@ -32,9 +33,28 @@ def kMeans(data, k, max_iter, min_improve_ratio= 1E-5):
             break;
     return cent_x
 
+def generate_data(mu, sigma, nSamples= 500):
+    """
+    生成符合多中心二维高斯分布的数据
+    :param mu: list of mu of array of mu
+    :param sigma: list of sigma or array of sigma
+    :param nSamples: nSample for each centroid
+    :return:
+    """
+    assert len(mu) == len(sigma), "inconsistent number of centroid"
+    nCentroid= mu.shape[0]
+    ret = np.zeros([nSamples * nCentroid, 2])
+    for i in range(nCentroid):
+        ret[i * nSamples: (i + 1) * nSamples] = np.random.randn(nSamples, 2) * sigma[i] + mu[i]
+    return ret
 
 if __name__ == '__main__':
     nSamples= 500
-    rndState= np.random.RandomState(20)
-    data = rndState.randn(nSamples, 2)
-    centers= kMeans(data, 5, 500)
+    mu = np.array([[1, 1], [-1, -1]]);
+    sigma= np.array([[0.5, 0.2], [0.2, 0.5]])
+    data = generate_data(mu, sigma, nSamples)
+    centers= kMeans(data, 2, 50)
+    fig, ax = plt.subplots()
+    ax.scatter(data[:, 0], data[:, 1])
+    ax.scatter(centers[:, 0], centers[:, 1])
+    plt.show()
